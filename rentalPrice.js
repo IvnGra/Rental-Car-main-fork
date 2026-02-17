@@ -13,6 +13,7 @@ const TWO_YEARS = 2;
 const THREE_YEARS = 3;
 const LICENSE_LOW_EXPERIENCE_MULTIPLIER = 1.3;
 const HIGH_SEASON_LICENSE_DAILY_SURCHARGE = 15;
+const WEEKEND_SURCHARGE = 2.50;
 
 function price(pickup, dropoff, pickupDate, dropoffDate, type, age, licenseYears) {
     const carType = type;
@@ -54,6 +55,11 @@ function price(pickup, dropoff, pickupDate, dropoffDate, type, age, licenseYears
         rentalPrice *= LICENSE_LOW_EXPERIENCE_MULTIPLIER;
     }
 
+    if (season === "Low") {
+        const weekendDays = countWeekendDays(pickupDate, dropoffDate);
+        rentalPrice += weekendDays * WEEKEND_SURCHARGE;
+    }
+
     return "$" + rentalPrice;
 }
 
@@ -62,7 +68,7 @@ function getDays(pickupDate, dropoffDate) {
     const firstDate = new Date(pickupDate);
     const secondDate = new Date(dropoffDate);
 
-    return Math.round(Math.abs((firstDate - secondDate) / oneDay)) + 1;
+    return Math.round(Math.abs((firstDate - secondDate) / oneDay)) + 1;// Inclusive of both pickup and dropoff days
 }
 
 function getSeason(pickupDate, dropoffDate) {
@@ -81,6 +87,26 @@ function getSeason(pickupDate, dropoffDate) {
     }
 
     return "Low";
+}
+
+function countWeekendDays(pickupDate, dropoffDate) {
+    const oneDay = 24 * 60 * 60 * 1000; 
+    const firstDate = new Date(pickupDate);
+    const secondDate = new Date(dropoffDate);
+    
+    let weekendCount = 0;
+    let currentDate = new Date(firstDate);
+    
+    while (currentDate <= secondDate) {
+        const dayOfWeek = currentDate.getDay();
+        // Saturday = 6, Sunday = 0
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            weekendCount++;
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return weekendCount;
 }
 
 exports.price = price;

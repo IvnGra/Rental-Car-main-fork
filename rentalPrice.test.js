@@ -36,7 +36,7 @@ test('young racer in high season gets racer and season multipliers', () => {
 
 test('long rental in low season gets discount and low-experience multiplier', () => {
   const res = price('A', 'B', '2025-11-01', '2025-11-12', 'Compact', 30, 1.5);
-  expect(parsePrice(res)).toBeCloseTo(421.2, 5);
+  expect(parsePrice(res)).toBeCloseTo(431.2, 5);
 });
 
 test('season detection treats rentals spanning high season as high', () => {
@@ -48,6 +48,19 @@ test('season detection treats rentals spanning high season as high', () => {
   expect(parsePrice(res)).toBeCloseTo(expected, 5);
 });
 
+// Example 1: 50 year old driver rents a car for three days: Monday, Tuesday, Wednesday - Total price $150
+test('50 year old driver weekday rental (Mon-Wed) - $150', () => {
+  const res = price('A', 'B', '2025-02-17', '2025-02-19', 'Compact', 50, 5);
+  // Feb 17-19, 2025 (Monday-Wednesday)
+  expect(parsePrice(res)).toBeCloseTo(150, 5);
+});
+
+// Example 2: 50 year old driver rents a car for three days: Thursday, Friday, Saturday - Total price $152.50
+test('50 year old driver weekend rental (Thu-Sat) - $152.50', () => {
+  const res = price('A', 'B', '2025-02-20', '2025-02-22', 'Compact', 50, 5);
+  // Feb 20-22, 2025 (Thursday-Saturday)
+  expect(parsePrice(res)).toBeCloseTo(152.50, 5);
+});
 
 
 
